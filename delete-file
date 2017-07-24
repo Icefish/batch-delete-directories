@@ -1,0 +1,68 @@
+#!/usr/bin/env node
+
+const finder = require('fs-finder');
+const argv = process.argv[2]
+const baseDir = argv
+const path = require('path')
+const fs = require('fs')
+const _ = require('lodash')
+const rimraf = require('rimraf')
+const Promise = require('bluebird')
+const music = ['.669', '.8st', '.aac', '.abk', '.ac1d', '.adsc', '.ahx',
+  '.aifc', '.aiff', '.ais', '.akp', '.alaw', '.amad', '.amc', '.ams', '.ams',
+  '.aon', '.apex', '.ape', '.aps', '.ase', '.asf', '.ast', '.asx ', '.au ',
+  '.avi', '.avr', '.ay', '.ben', '.bp', '.c01', '.cda', '.cdr', '.chan',
+  '.cmf', '.crb', '.cust', '.dbm', '.dcm', '.dew', '.df2', '.dfc', '.di',
+  '.dig', '.dig', '.digi', '.dls', '.dm1', '.dmf', '.dmf', '.dmu', '.dns',
+  '.dsf', '.dsm', '.dsp', '.dss', '.dtm', '.dts', '.dw', '.dwd', '.ea',
+  '.flac', '.wav', '.aif'
+]
+const movie = ['.webm', '.mkv', '.flv', '.flv', '.vob', '.ogv',
+  '.ogg', '.drc', '.gif', '.gifv', '.mng', '.avi', '.mov', '.qt', '.wmv',
+  '.yuv', '.rm', '.rmvb', '.asf', '.amv', '.mp4', '.m4p', '.m4v', '.mpg',
+  '.mp2', '.mpeg', '.mpe', '.mpv', '.mpg', '.mpeg', '.m2v', '.m4v', '.svi',
+  '.3gp', '.3g2', '.mxf', '.roq', '.nsv', '.flv', '.f4v', '.f4p', '.f4a',
+  '.f4b'
+]
+
+if (!baseDir || baseDir.trim() === '') {
+  throw new Error('No path specified')
+}
+
+const filter = (stat, filePath) => {
+  const extname = path.extname(filePath)
+
+  return music.indexOf(extname) !== -1
+}
+
+const matchFiles = finder.from(baseDir).filter(filter).findFiles()
+const dirs = finder.from(baseDir).findDirectories()
+let matchDir = []
+
+matchFiles.forEach(file => {
+  matchDir.push(path.dirname(file))
+})
+
+matchDir = _.uniq(matchDir)
+
+let noMatchDir = []
+
+_.difference(dirs, matchDir).forEach(dir => {
+  if (!hasDirectories(dir)) {
+    noMatchDir.push(dir)
+  }
+})
+
+Promise.each(noMatchDir, dir => {
+  console.log(dir, 'done')
+  rimraf(dir, function() {
+    console.log(dir, 'done')
+  })
+})
+
+function hasDirectories(srcpath) {
+  const dirs = fs.readdirSync(srcpath)
+    .filter(file => fs.lstatSync(path.join(srcpath, file)).isDirectory())
+
+  return dirs.length !== 0
+}

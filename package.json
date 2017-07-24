@@ -1,0 +1,14 @@
+{
+  "name": "delete-file",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {},
+  "dependencies": {
+    "fs-finder": "*",
+    "minimist": "^1.2.0",
+    "lodash": "^3.7.0",
+    "rimraf": "*",
+    "bluebird": "*"
+  },
+  "devDependencies": {}
+}
